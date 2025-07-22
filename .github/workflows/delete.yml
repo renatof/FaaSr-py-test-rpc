@@ -2,21 +2,24 @@ name: Running Action- delete
 on:
   workflow_dispatch:
     inputs:
-      PAYLOAD:
-        description: 'Payload'
-        required: false
-
+      OVERWRITTEN:
+        description: 'overwritten fields'
+        required: true
+      PAYLOAD_URL:
+        description: 'url to payload'
+        required: true
 jobs:
   run_docker_image:
     runs-on: ubuntu-latest
-    container: ghcr.io/faasr/github-actions-tidyverse:latest
+    container: ghcr.io/nolcut/ga-rpc-python:0.1.4
     env:
       SECRET_PAYLOAD: ${{ secrets.SECRET_PAYLOAD }}
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       PAYLOAD_REPO: ${{ vars.PAYLOAD_REPO }}
-      PAYLOAD: ${{ github.event.inputs.PAYLOAD }}
+      OVERWRITTEN: ${{ github.event.inputs.OVERWRITTEN }}
+      PAYLOAD_URL: ${{ github.event.inputs.PAYLOAD_URL }}
     steps:
-    - name: run Rscript
+    - name: run Python
       run: |
         cd /action
-        Rscript faasr_start_invoke_github-actions.R
+        python3 faasr_start_invoke_github_actions.py
